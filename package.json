@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/ke2low/tinyapp/issues"
   },
-  "homepage": "https://github.com/ke2low/tinyapp#readme"
+  "homepage": "https://github.com/ke2low/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
