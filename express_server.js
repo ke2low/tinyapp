@@ -11,7 +11,9 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.set("view engine", "ejs")
 
+const users = { 
 
+}
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -65,6 +67,11 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+app.get("/register", (req, res) =>  {
+  let templateVars = { username: req.cookies["username"] }
+  res.render("urls_register", templateVars);
+})
+
 function generateRandomString() {
   let randomStringArray = [];
   for(let i = 0; i < 6; i++) {
@@ -75,6 +82,18 @@ function generateRandomString() {
     }
   }
   return randomStringArray.join("")
+}
+
+function emailCheck(address) {
+  let emailExists =  false;
+  Object.keys(users).forEach(function(person) {
+    console.log(users[person])
+    console.log("user object" + users.person)
+    if (address == users[person].email) {
+      emailExists = true;
+    }
+  });
+  return emailExists;
 }
 
 app.post("/urls", (req, res) => {
@@ -119,4 +138,24 @@ app.post("/login", (req, res) =>  {
 app.post("/logout", (req, res) => {
   res.clearCookie("username");
   res.redirect("/urls");
+})
+
+app.post("/register", (req, res) => {
+  if (!req.body.email || !req.body.password)  {
+    console.log("ERRORs")
+    res.status(400).send('Please make sure both email and password fields are filled.');
+  } else if (emailCheck(req.body.email)) {
+    console.log("ERRORss")
+    res.status(400).send('That email already exists');
+  } else {
+    userId = generateRandomString();
+    res.cookie('user_id', userId);
+    users[userId] = {
+      id: userId,
+      email: req.body.email,
+      password: req.body.password,
+    }
+    // console.log(users);
+    res.redirect("/urls")
+  }
 })
