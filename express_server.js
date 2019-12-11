@@ -2,6 +2,7 @@ const express = require("express");
 //app is a variable name, you can rename it as something else such as router
 const app = express();
 const PORT = 8080; // default port 8080
+const bcrypt = require('bcrypt');
 
 //cookie parser required in order to use req.cookies[]
 var cookieParser = require('cookie-parser')
@@ -61,7 +62,6 @@ function filterObject(database, id) {
     }
   })
   //filteredURLDatabase is undefined for some reason
-  console.log("filtered URLS " + filteredURLDatabase)
   return filteredURLDatabase;
 }
 
@@ -181,7 +181,7 @@ function passwordCheck(address, password)  {
   let passwordCorrect = false;
   Object.keys(users).forEach(function(person) {
     if (address == users[person].email) {
-      if (password == users[person].password) {
+      if (bcrypt.compareSync(password, users[person].password)) {
         passwordCorrect = true;
       }
     }
@@ -279,7 +279,7 @@ app.post("/register", (req, res) => {
     users[userId] = {
       id: userId,
       email: req.body.email,
-      password: req.body.password,
+      password: bcrypt.hashSync(req.body.password, 10)
     }
     console.log(users);
     res.redirect("/urls")
