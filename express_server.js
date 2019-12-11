@@ -47,30 +47,41 @@ app.get("/fetch", (req, res) => {
 
 app.get("/urls", (req, res) => {
   let templateVars = {
-    username: req.cookies["username"], 
+    // username: req.cookies["username"], 
+    username: users[req.cookies["user_id"]],
     urls: urlDatabase 
   };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  let templateVars = { username: req.cookies["username"] }
+  let templateVars = { username: users[req.cookies["user_id"]] }
   res.render("urls_new", templateVars);
 });
 
+//req.cookies["username"]
 app.get("/urls/:shortURL", (req, res) => {
   let templateVars = { 
-    username: req.cookies["username"], 
+    // username: req.cookies["username"]
+    username: users[req.cookies["user_id"]], 
     shortURL: req.params.shortURL, 
     longURL: urlDatabase[req.params.shortURL] 
   };
   res.render("urls_show", templateVars);
 });
 
+//req.cookies["username"]
 app.get("/register", (req, res) =>  {
-  let templateVars = { username: req.cookies["username"] }
+  let templateVars = { username: users[req.cookies["user_id"]] }
   res.render("urls_register", templateVars);
 })
+
+app.get("/login", (req, res) =>  {
+  let templateVars = { username: users[req.cookies["user_id"]] }
+  res.render("urls_login", templateVars);
+})
+
+
 
 function generateRandomString() {
   let randomStringArray = [];
@@ -85,15 +96,37 @@ function generateRandomString() {
 }
 
 function emailCheck(address) {
-  let emailExists =  false;
+  let emailExists = false
   Object.keys(users).forEach(function(person) {
-    console.log(users[person])
-    console.log("user object" + users.person)
+    // console.log(users[person])
+    // console.log("user object" + users.person)
     if (address == users[person].email) {
       emailExists = true;
     }
   });
   return emailExists;
+}
+
+function passwordCheck(address, password)  {
+  let passwordCorrect = false;
+  Object.keys(users).forEach(function(person) {
+    if (address == users[person].email) {
+      if (password == users[person].password) {
+        passwordCorrect = true;
+      }
+    }
+  })
+  return passwordCorrect;
+}
+
+function userIdFind(address)  {
+  let userId;
+  Object.keys(users).forEach(function(person) {
+    if (address == users[person].email) {
+      userId = users[person].id;
+    }
+  });
+  return userId;
 }
 
 app.post("/urls", (req, res) => {
@@ -129,14 +162,26 @@ app.post("/urls/:shortURL/edit", (req, res)  =>  {
 })
 
 app.post("/login", (req, res) =>  {
-  console.log(req.body.username);
-  res.cookie("username", req.body.username)
-  res.redirect("/urls");
-  // res.send(req.body.username);
+  if (!req.body.email || !req.body.password)  {
+    console.log("ERRORs")
+    res.status(400).send('Please make sure both email and password fields are filled.');
+  } else if (!emailCheck(req.body.email)) {
+    console.log("ERRORss")
+    res.status(403).send('That email is not associated with any account');
+  } else if (emailCheck(req.body.email))  {
+    if (!passwordCheck(req.body.email, req.body.password)) {
+      res.status(403).send('That password is incorrect');
+    } else if (passwordCheck(req.body.email, req.body.password))  {
+      let userId = userIdFind(req.body.email);
+      res.cookie('user_id', userId)
+      res.redirect("/urls")
+    }
+  }
 })
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("username");
+  // res.clearCookie("username");
+  res.clearCookie("user_id");
   res.redirect("/urls");
 })
 
@@ -148,14 +193,14 @@ app.post("/register", (req, res) => {
     console.log("ERRORss")
     res.status(400).send('That email already exists');
   } else {
-    userId = generateRandomString();
+    let userId = generateRandomString();
     res.cookie('user_id', userId);
     users[userId] = {
       id: userId,
       email: req.body.email,
       password: req.body.password,
     }
-    // console.log(users);
+    console.log(users);
     res.redirect("/urls")
   }
 })
