@@ -12,12 +12,15 @@
       <div class="card-header"></div>
       <div class="card-body">
         <h5 class="card-title">TinyURL for: <%= longURL %></h5>
-        <p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
-        <form method="POST" action="/urls/<%= shortURL %>/edit">
-          EDIT<br>
-          New URL:
-          <input type="text" name="longURL">
-          <button type="submit" class="btn btn-primary">Submit</button>
+        <p class="card-text"><span style="font-weight:bold">Short URL: </span><a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
+        <p class="card-text"><span style="font-weight:bold">Date Created: </span> <%= urls[shortURL].time %></a></p>
+        <p class="card-text"><span style="font-weight:bold"># of Visits: </span> <%= urls[shortURL].visits %></a></p>
+        <p class="card-text"><span style="font-weight:bold"># of Unique Visits: </span> <%= urls[shortURL].uniqueVisits %></a></p>
+        <form method="POST" action="/urls/<%= shortURL %>">
+          <p style="font-size: 20px; margin: 0px 0px; padding: 0px 0px; letter-spacing: 3px;">EDIT</p>
+          <span style="font-weight:bold" >New URL:</span>
+          <input style="width:500px" type="text" value="https://" name="longURL">
+          <button type="submit" class="btn btn-primary">Update</button>
         </form>
       </div>
     <div class="card-footer text-muted"></div>

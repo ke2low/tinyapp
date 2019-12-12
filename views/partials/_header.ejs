@@ -7,13 +7,13 @@
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
-        <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
+        <a class="nav-item nav-link" href="/urls/new" style="margin-right: 20px">Create New URL</a>
         <% if(username){ %>
-          <a class="nav-item nav-link" style="color: black">Logged In As: <%= username.email %>!</a>
-          <form method="POST" action="/logout"><button>Logout</button> </form>
+          <a style=" color: black" class="nav-item nav-link">Logged In As: <%= username.email %>!</a>
+          <form style="" method="POST" action="/logout"><button style="padding: 5px 15px; margin: 0px 10px 10px 0px; background: #017BFF; border-radius: 5px; color: white; border-color:#017BFF; ">Logout</button> </form>
         <% } else{ %>  
-          <form method="GET" action="/login"><button>Login</button> </form>
-          <form method="GET" action="/register"><button>Register</button> </form>
+          <form method="GET" action="/login"><button style="padding: 5px 15px; margin: 0px 10px 10px 0px; background: #017BFF; border-radius: 5px; color: white; border-color:#017BFF; ">Login</button> </form>
+          <form method="GET" action="/register"><button style="padding: 5px 15px; margin: 0px 10px 10px 0px; background: #017BFF; border-radius: 5px; color: white; border-color:#017BFF">Register</button> </form>
         <% } %>
       </div>
     </div>
