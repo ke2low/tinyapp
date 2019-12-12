@@ -124,7 +124,7 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   let filteredURLDatabase = urlsForUser(req.session.user_id, urlDatabase);
   if (shortURLExists(req.params.shortURL) === false) {
-    res.status(400).send('Error:400 - Invalid Link');
+    res.status(404).send('404 Not Found : Page not found');
   }
   let templateVars = {
     username: users[req.session.user_id],
@@ -134,11 +134,11 @@ app.get("/urls/:shortURL", (req, res) => {
   };
 
   if (urlDatabase[req.params.shortURL].userID !== req.session.user_id)  {
-    res.status(400).send('Error:400 - You may only view urls associated to with own account');
+    res.status(403).send('403 Forbidden : You may only view urls associated to with own account.');
   } else if (urlDatabase[req.params.shortURL].userID === req.session.user_id && shortURLExists(req.params.shortURL))  {
     res.render("urls_show", templateVars);
   } else if (shortURLExists(req.params.shortURL) === false) {
-    res.status(400).send('Error:400 - Please login or register.');
+    res.status(307).send('307 Redirect - Please login or register.');
   }
 });
 
@@ -183,15 +183,15 @@ app.get("/u/:shortURL", (req, res) => {
     const longURL = urlDatabase[req.params.shortURL].longURL;
     res.redirect(longURL);
   } else if (shortURLExists(req.params.shortURL) === false) {
-    res.status(400).send('Error 401: Invalid link, page not found');
+    res.status(404).send('404 Not Found : Page not found');
   }
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
   if (!req.session.user_id) {
-    res.status(400).send('Please login to delete URLs');
+    res.status(401).send('401 Unauthorized : Please login to delete URLs.');
   } else if (req.session.user_id !== urlDatabase[req.params.shortURL].userID) {
-    res.status(400).send('You are only allowed to delete URLs belonging to your account');
+    res.status(400).send('403 Forbidden : You are only allowed to delete URLs belonging to your account.');
   } else {
     delete urlDatabase[req.params.shortURL];
     res.redirect("/urls");
@@ -200,9 +200,9 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 app.post("/urls/:shortURL", (req, res)  =>  {
   if (!req.session.user_id) {
-    res.status(400).send('Please login to edit URLs');
+    res.status(401).send('401 Unauthorized : Please login to edit URLs.');
   } else if (req.session.user_id !== urlDatabase[req.params.shortURL].userID) {
-    res.status(400).send('You are only allowed to edit urls belonging to your account');
+    res.status(403).send('403 Forbidden : You are only allowed to edit urls belonging to your account.');
   } else {
     urlDatabase[req.params.shortURL].longURL = req.body.longURL;
     res.redirect("/urls");
@@ -211,12 +211,12 @@ app.post("/urls/:shortURL", (req, res)  =>  {
 
 app.post("/login", (req, res) =>  {
   if (!req.body.email || !req.body.password)  {
-    res.status(400).send('Please make sure both email and password fields are filled.');
+    res.status(401).send('401 Bad Request : Please make sure both email and password fields are filled.');
   } else if (!emailCheck(req.body.email)) {
-    res.status(403).send('That email is not associated with any account');
+    res.status(404).send('404 Not Found : That email is not associated with any account');
   } else if (emailCheck(req.body.email))  {
     if (!passwordCheck(req.body.email, req.body.password)) {
-      res.status(403).send('That password is incorrect');
+      res.status(401).send('401 Bad Request : That password is incorrect');
     } else if (passwordCheck(req.body.email, req.body.password))  {
       let userId = getUserByEmail(req.body.email, users);
       req.session.user_id = userId;
@@ -232,9 +232,9 @@ app.post("/logout", (req, res) => {
 
 app.post("/register", (req, res) => {
   if (!req.body.email || !req.body.password)  {
-    res.status(400).send('Please make sure both email and password fields are filled.');
+    res.status(401).send('401 Bad Request : Please make sure both email and password fields are filled.');
   } else if (emailCheck(req.body.email)) {
-    res.status(400).send('That email already exists');
+    res.status(401).send('401 Bad Request : That email already exists');
   } else {
     let userId = generateRandomString();
     req.session.user_id = userId;
