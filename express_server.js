@@ -176,6 +176,9 @@ app.get("/u/:shortURL", (req, res) => {
     if (uniqueUserTracker[req.session.user_id] === undefined)  {
       uniqueUserTracker[req.session.user_id] = 1;
       urlDatabase[req.params.shortURL].uniqueVisits += 1;
+    } else if (uniqueUserTracker[req.session.user_id] !== undefined && urlDatabase[req.params.shortURL].uniqueVisits === 0) {
+      uniqueUserTracker[req.session.user_id] = 1;
+      urlDatabase[req.params.shortURL].uniqueVisits += 1;
     }
     const longURL = urlDatabase[req.params.shortURL].longURL;
     res.redirect(longURL);
